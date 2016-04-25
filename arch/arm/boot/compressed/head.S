@@ -135,6 +135,9 @@ start:
 		.word	_edata			@ zImage end address
  THUMB(		.thumb			)
 1:
+		mov	r0, #0
+		mov	r1, #0xffffffff
+		mov	r3, #0
 		mrs	r9, cpsr
 #ifdef CONFIG_ARM_VIRT_EXT
 		bl	__hyp_stub_install	@ get into SVC mode, reversibly
