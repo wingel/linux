@@ -21,8 +21,8 @@
 
 	serial@50000000 {
 		status = "okay";
-		pinctrl-names = "default";
-		pinctrl-0 = <&uart0_data>, <&uart0_fctl>;
+//		pinctrl-names = "default";
+//		pinctrl-0 = <&uart0_data>, <&uart0_fctl>;
 	};
 
 	serial@50004000 {

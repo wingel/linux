@@ -26,6 +26,7 @@
 #include <plat/cpu.h>
 #include <plat/pm.h>
 #include <plat/regs-serial.h>
+#include <plat/samsung-time.h>
 
 #include "common.h"
 
@@ -64,6 +65,7 @@ static void __init s3c2416_dt_map_io(void)
 {
 	s3c24xx_init_io(NULL, 0);
 	s3c24xx_init_clocks(12000000);
+	samsung_set_timer_source(SAMSUNG_PWM3, SAMSUNG_PWM4);
 }
 
 static void __init s3c2416_dt_machine_init(void)
@@ -84,8 +86,10 @@ DT_MACHINE_START(S3C2416_DT, "Samsung S3C2416 (Flattened Device Tree)")
 	/* Maintainer: Heiko Stuebner <heiko@sntech.de> */
 	.dt_compat	= s3c2416_dt_compat,
 	.map_io		= s3c2416_dt_map_io,
-	.init_irq	= irqchip_init,
+	.init_irq	= s3c2416_init_irq,
+//	.init_irq	= irqchip_init,
 	.init_machine	= s3c2416_dt_machine_init,
-	 .init_time	= clocksource_of_init,
+//	 .init_time	= clocksource_of_init,
+	.init_time      = samsung_timer_init,
 	.restart	= s3c2416_restart,
 MACHINE_END

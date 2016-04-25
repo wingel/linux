@@ -58,6 +58,7 @@
 #include "common-smdk.h"
 
 static struct map_desc smdk2416_iodesc[] __initdata = {
+#if 0
 	/* ISA IO Space map (memory space selected by A24) */
 
 	{
@@ -81,6 +82,7 @@ static struct map_desc smdk2416_iodesc[] __initdata = {
 		.length		= SZ_4M,
 		.type		= MT_DEVICE,
 	}
+#endif
 };
 
 #define UCON (S3C2410_UCON_DEFAULT	| \
@@ -101,6 +103,7 @@ static struct s3c2410_uartcfg smdk2416_uartcfgs[] __initdata = {
 		.ulcon	     = ULCON,
 		.ufcon	     = UFCON,
 	},
+#if 0
 	[1] = {
 		.hwport	     = 1,
 		.flags	     = 0,
@@ -123,21 +126,26 @@ static struct s3c2410_uartcfg smdk2416_uartcfgs[] __initdata = {
 		.ulcon	     = ULCON,
 		.ufcon	     = UFCON,
 	}
+#endif
 };
 
 static void smdk2416_hsudc_gpio_init(void)
 {
+#if 0
 	s3c_gpio_setpull(S3C2410_GPH(14), S3C_GPIO_PULL_UP);
 	s3c_gpio_setpull(S3C2410_GPF(2), S3C_GPIO_PULL_NONE);
 	s3c_gpio_cfgpin(S3C2410_GPH(14), S3C_GPIO_SFN(1));
 	s3c2410_modify_misccr(S3C2416_MISCCR_SEL_SUSPND, 0);
+#endif
 }
 
 static void smdk2416_hsudc_gpio_uninit(void)
 {
+#if 0
 	s3c2410_modify_misccr(S3C2416_MISCCR_SEL_SUSPND, 1);
 	s3c_gpio_setpull(S3C2410_GPH(14), S3C_GPIO_PULL_NONE);
 	s3c_gpio_cfgpin(S3C2410_GPH(14), S3C_GPIO_SFN(0));
+#endif
 }
 
 static struct s3c24xx_hsudc_platdata smdk2416_hsudc_platdata = {
@@ -169,6 +177,7 @@ static struct fb_videomode smdk2416_lcd_timing = {
 
 static void s3c2416_fb_gpio_setup_24bpp(void)
 {
+#if 0
 	unsigned int gpio;
 
 	for (gpio = S3C2410_GPC(1); gpio <= S3C2410_GPC(4); gpio++) {
@@ -185,6 +194,7 @@ static void s3c2416_fb_gpio_setup_24bpp(void)
 		s3c_gpio_cfgpin(gpio, S3C_GPIO_SFN(2));
 		s3c_gpio_setpull(gpio, S3C_GPIO_PULL_NONE);
 	}
+#endif
 }
 
 static struct s3c_fb_platdata smdk2416_fb_platdata = {
@@ -210,11 +220,13 @@ static struct s3c_sdhci_platdata smdk2416_hsmmc1_pdata __initdata = {
 static struct platform_device *smdk2416_devices[] __initdata = {
 	&s3c_device_fb,
 	&s3c_device_wdt,
+#if 0
 	&s3c_device_ohci,
 	&s3c_device_i2c0,
 	&s3c_device_hsmmc0,
 	&s3c_device_hsmmc1,
 	&s3c_device_usb_hsudc,
+#endif
 };
 
 static void __init smdk2416_map_io(void)
@@ -230,6 +242,7 @@ static void __init smdk2416_machine_init(void)
 	s3c_i2c0_set_platdata(NULL);
 	s3c_fb_set_platdata(&smdk2416_fb_platdata);
 
+#if 0
 	s3c_sdhci0_set_platdata(&smdk2416_hsmmc0_pdata);
 	s3c_sdhci1_set_platdata(&smdk2416_hsmmc1_pdata);
 
@@ -243,7 +256,7 @@ static void __init smdk2416_machine_init(void)
 
 	gpio_request(S3C2410_GPB(1), "Display Reset");
 	gpio_direction_output(S3C2410_GPB(1), 1);
-
+#endif
 	platform_add_devices(smdk2416_devices, ARRAY_SIZE(smdk2416_devices));
 	smdk_machine_init();
 }

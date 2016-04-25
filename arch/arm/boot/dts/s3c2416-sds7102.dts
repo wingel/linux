@@ -1,0 +1,27 @@
+/*
+ * Owon SDS7102 oscilloscope device tree source
+ *
+ * Copyright (c) 2016 Christer Weinigel <christer@weinigel.se>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/dts-v1/;
+#include "s3c2416.dtsi"
+
+/ {
+	model = "SDS7102";
+	compatible = "samsung,s3c2416";
+
+	memory {
+		reg =  <0x30000000 0x4000000>;
+	};
+
+	serial@50000000 {
+		status = "okay";
+		pinctrl-names = "default";
+		pinctrl-0 = <&uart0_data>; /* , <&uart0_fctl>; */
+	};
+};
