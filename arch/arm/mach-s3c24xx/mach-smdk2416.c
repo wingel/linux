@@ -218,9 +218,9 @@ static struct s3c_sdhci_platdata smdk2416_hsmmc1_pdata __initdata = {
 static struct platform_device *smdk2416_devices[] __initdata = {
 	&s3c_device_fb,
 	&s3c_device_wdt,
-#if 0
 	&s3c_device_ohci,
 	&s3c_device_i2c0,
+#if 0
 	&s3c_device_hsmmc0,
 	&s3c_device_hsmmc1,
 	&s3c_device_usb_hsudc,
@@ -243,9 +243,16 @@ static void __init smdk2416_machine_init(void)
 #if 0
 	s3c_sdhci0_set_platdata(&smdk2416_hsmmc0_pdata);
 	s3c_sdhci1_set_platdata(&smdk2416_hsmmc1_pdata);
+#endif
 
 	s3c24xx_hsudc_set_platdata(&smdk2416_hsudc_platdata);
 
+	printk("GPA(0) = %d\n", S3C2410_GPA(0));
+	printk("GPB(0) = %d\n", S3C2410_GPB(0));
+	printk("GPC(0) = %d\n", S3C2410_GPC(0));
+	printk("GPD(0) = %d\n", S3C2410_GPD(0));
+
+#if 0
 	gpio_request(S3C2410_GPB(4), "USBHost Power");
 	gpio_direction_output(S3C2410_GPB(4), 1);
 
@@ -255,6 +262,7 @@ static void __init smdk2416_machine_init(void)
 	gpio_request(S3C2410_GPB(1), "Display Reset");
 	gpio_direction_output(S3C2410_GPB(1), 1);
 #endif
+
 	platform_add_devices(smdk2416_devices, ARRAY_SIZE(smdk2416_devices));
 	smdk_machine_init();
 }

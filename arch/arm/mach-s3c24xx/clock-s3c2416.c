@@ -153,8 +153,43 @@ void __init s3c2416_init_clocks(int xtal)
 	u32 epllcon1 = __raw_readl(S3C2443_EPLLCON+4);
 	int ptr;
 
+	{
+		u32 clksrc;
+
+		clksrc = __raw_readl(S3C2443_CLKSRC);
+		printk("%s: CLKSRC 0x%08x\n", __func__, (int)clksrc);
+		clksrc |= 0x40;
+		__raw_writel(clksrc, S3C2443_CLKSRC);
+		clksrc = __raw_readl(S3C2443_CLKSRC);
+		printk("%s: CLKSRC 0x%08x\n", __func__, (int)clksrc);
+	}
+
+	{
+		u32 clkdiv1;
+
+		clkdiv1 = __raw_readl(S3C2443_CLKDIV1);
+		printk("%s: CLKDIV1 0x%08x\n", __func__, (int)clkdiv1);
+		clkdiv1 &= ~(3 << 4);
+		__raw_writel(clkdiv1, S3C2443_CLKDIV1);
+		clkdiv1 = __raw_readl(S3C2443_CLKDIV1);
+		printk("%s: CLKDIV1 0x%08x\n", __func__, (int)clkdiv1);
+	}
+
+	/* Hack.  Force EPLL to start up and run 48 MHz */
+	__raw_writel(0x00200103, S3C2443_EPLLCON);
+	printk("%s: EPLLCON 0x%08x\n", __func__, (int)epllcon);
+	{
+		volatile int i;
+		for (i = 0; i < 1000000; i++)
+			;
+	}
+	epllcon = __raw_readl(S3C2443_EPLLCON);
+	printk("%s: EPLLCON 0x%08x\n", __func__, (int)epllcon);
+
 	/* s3c2416 EPLL compatible with s3c64xx */
 	clk_epll.rate = s3c_get_pll6553x(xtal, epllcon, epllcon1);
+
+	printk("%s: clk_epll.rate %u\n", __func__, (int)clk_epll.rate);
 
 	clk_epll.parent = &clk_epllref.clk;
 

@@ -600,6 +600,9 @@ void __init_or_cpufreq s3c2443_common_setup_clocks(pll_fn get_mpll)
 		clk_set_rate(&clk_usb_bus_host.clk, 48*1000*1000);
 	}
 
+	printk("EPLLCON 0x%08x\n", (int)epllcon);
+	printk("USB host bus at %u\n", (int)clk_get_rate(&clk_usb_bus_host.clk));
+
 	printk("CPU: EPLL %s %ld.%03ld MHz, usb-bus %ld.%03ld MHz\n",
 	       (epllcon & S3C2443_PLLCON_OFF) ? "off" : "on",
 	       print_mhz(clk_get_rate(&clk_epll)),
