@@ -205,9 +205,17 @@ static void s3c_hsudc_init_phy(void)
 	cfg &= ~(S3C2443_URSTCON_FUNCRST | S3C2443_URSTCON_PHYRST);
 	writel(cfg, S3C2443_URSTCON);
 
+	// This hangs the kernel soon after
 	cfg = readl(S3C2443_PHYCTRL);
+#if 0
 	cfg &= ~(S3C2443_PHYCTRL_CLKSEL | S3C2443_PHYCTRL_DSPORT);
 	cfg |= (S3C2443_PHYCTRL_EXTCLK | S3C2443_PHYCTRL_PLLSEL);
+#else
+	cfg &= 0x3e;
+	cfg |= 0x10;		/* from SDS7102 bootloader */
+#endif
+	printk("%s:%u: PHYCTRL <- 0x%08x\n", __func__, __LINE__,
+	       (unsigned)cfg);
 	writel(cfg, S3C2443_PHYCTRL);
 
 	cfg = readl(S3C2443_PHYPWR);
@@ -1038,7 +1046,9 @@ static void s3c_hsudc_reconfig(struct s3c_hsudc *hsudc)
 	writel(1, hsudc->regs + S3C_EIER);
 	writel(0, hsudc->regs + S3C_TR);
 	writel(S3C_SCR_DTZIEN_EN | S3C_SCR_RRD_EN | S3C_SCR_SUS_EN |
-			S3C_SCR_RST_EN, hsudc->regs + S3C_SCR);
+			S3C_SCR_RST_EN | 0xc8, hsudc->regs + S3C_SCR);
+	printk("SCR -> 0x%08x\n",
+	       (unsigned)readl(hsudc->regs + S3C_SCR));
 	writel(0, hsudc->regs + S3C_EP0CR);
 
 	s3c_hsudc_setup_ep(hsudc);

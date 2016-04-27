@@ -131,21 +131,29 @@ static struct s3c2410_uartcfg smdk2416_uartcfgs[] __initdata = {
 
 static void smdk2416_hsudc_gpio_init(void)
 {
+	printk("%s:%u:\n", __func__, __LINE__);
+
 #if 0
 	s3c_gpio_setpull(S3C2410_GPH(14), S3C_GPIO_PULL_UP);
 	s3c_gpio_setpull(S3C2410_GPF(2), S3C_GPIO_PULL_NONE);
 	s3c_gpio_cfgpin(S3C2410_GPH(14), S3C_GPIO_SFN(1));
-	s3c2410_modify_misccr(S3C2416_MISCCR_SEL_SUSPND, 0);
 #endif
+	s3c2410_modify_misccr(S3C2416_MISCCR_SEL_SUSPND, 0);
+
+	printk("%s:%u:\n", __func__, __LINE__);
 }
 
 static void smdk2416_hsudc_gpio_uninit(void)
 {
-#if 0
+	printk("%s:%u:\n", __func__, __LINE__);
+
 	s3c2410_modify_misccr(S3C2416_MISCCR_SEL_SUSPND, 1);
+#if 0
 	s3c_gpio_setpull(S3C2410_GPH(14), S3C_GPIO_PULL_NONE);
 	s3c_gpio_cfgpin(S3C2410_GPH(14), S3C_GPIO_SFN(0));
 #endif
+
+	printk("%s:%u:\n", __func__, __LINE__);
 }
 
 static struct s3c24xx_hsudc_platdata smdk2416_hsudc_platdata = {
@@ -223,8 +231,8 @@ static struct platform_device *smdk2416_devices[] __initdata = {
 #if 0
 	&s3c_device_hsmmc0,
 	&s3c_device_hsmmc1,
-	&s3c_device_usb_hsudc,
 #endif
+	&s3c_device_usb_hsudc,
 };
 
 static void __init smdk2416_map_io(void)
@@ -247,21 +255,20 @@ static void __init smdk2416_machine_init(void)
 
 	s3c24xx_hsudc_set_platdata(&smdk2416_hsudc_platdata);
 
-	printk("GPA(0) = %d\n", S3C2410_GPA(0));
-	printk("GPB(0) = %d\n", S3C2410_GPB(0));
-	printk("GPC(0) = %d\n", S3C2410_GPC(0));
-	printk("GPD(0) = %d\n", S3C2410_GPD(0));
+	/* TODO this could probably be a PWM signal */
+	gpio_request(S3C2410_GPB(3), "Display Brightness");
+	gpio_direction_output(S3C2410_GPB(3), 0);
 
 #if 0
 	gpio_request(S3C2410_GPB(4), "USBHost Power");
 	gpio_direction_output(S3C2410_GPB(4), 1);
 
-	gpio_request(S3C2410_GPB(3), "Display Power");
-	gpio_direction_output(S3C2410_GPB(3), 1);
-
 	gpio_request(S3C2410_GPB(1), "Display Reset");
 	gpio_direction_output(S3C2410_GPB(1), 1);
 #endif
+
+	s3c2410_modify_misccr(S3C2410_MISCCR_CLK1_MASK,
+			      S3C2410_MISCCR_CLK1_UPLL);
 
 	platform_add_devices(smdk2416_devices, ARRAY_SIZE(smdk2416_devices));
 	smdk_machine_init();
