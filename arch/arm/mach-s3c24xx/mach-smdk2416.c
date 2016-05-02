@@ -158,7 +158,7 @@ static struct s3c24xx_hsudc_platdata smdk2416_hsudc_platdata = {
 
 static struct s3c_fb_pd_win smdk2416_fb_win[] = {
 	[0] = {
-		.default_bpp	= 16,
+		.default_bpp	= 24,
 		.max_bpp	= 32,
 		.xres           = 800,
 		.yres           = 600,
