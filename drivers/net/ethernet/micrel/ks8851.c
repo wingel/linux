@@ -441,6 +441,13 @@ static void ks8851_init_mac(struct ks8851_net *ks)
 	}
 
 	eth_hw_addr_random(dev);
+	dev->addr_assign_type = NET_ADDR_SET;
+	dev->dev_addr[0] = 0xde;
+	dev->dev_addr[1] = 0xad;
+	dev->dev_addr[2] = 0xbe;
+	dev->dev_addr[3] = 0xef;
+	dev->dev_addr[4] = 0xed;
+	dev->dev_addr[5] = 0x07;
 	ks8851_write_mac_addr(dev);
 }
 
