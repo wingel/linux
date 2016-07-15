@@ -28,6 +28,9 @@
 #include <linux/spi/spi_gpio.h>
 #include <linux/platform_data/spi-s3c64xx.h>
 
+#include <linux/i2c.h>
+#include <linux/i2c-gpio.h>
+
 #include <asm/mach/arch.h>
 #include <asm/mach/map.h>
 #include <asm/mach/irq.h>
@@ -274,6 +277,19 @@ static struct platform_device sds7102_device_spi = {
 };
 #endif
 
+static struct i2c_gpio_platform_data sds7102_i2c_pdata_chrontel = {
+	.sda_pin	= S3C2410_GPB(4),
+	.scl_pin	= S3C2410_GPB(9),
+};
+
+static struct platform_device sds7102_i2c_chrontel = {
+	.name		= "i2c-gpio",
+	.id		= 1,
+	.dev		= {
+		.platform_data = &sds7102_i2c_pdata_chrontel,
+	},
+};
+
 static struct s3c_sdhci_platdata smdk2416_hsmmc0_pdata __initdata = {
 	.max_width		= 4,
 	.cd_type		= S3C_SDHCI_CD_GPIO,
@@ -296,6 +312,7 @@ static struct platform_device *smdk2416_devices[] __initdata = {
 	&s3c_device_hsmmc1,
 #endif
 	&sds7102_device_spi,
+	&sds7102_i2c_chrontel,
 //	&s3c_device_usb_hsudc,
 };
 
