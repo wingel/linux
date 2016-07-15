@@ -200,7 +200,12 @@ static void s3c2416_fb_gpio_setup_24bpp(void)
 		s3c_gpio_setpull(gpio, S3C_GPIO_PULL_NONE);
 	}
 
-	for (gpio = S3C2410_GPD(0); gpio <= S3C2410_GPD(15); gpio++) {
+	for (gpio = S3C2410_GPD(0); gpio <= S3C2410_GPD(7); gpio++) {
+		s3c_gpio_cfgpin(gpio, S3C_GPIO_SFN(2));
+		s3c_gpio_setpull(gpio, S3C_GPIO_PULL_NONE);
+	}
+
+	for (gpio = S3C2410_GPD(9); gpio <= S3C2410_GPD(15); gpio++) {
 		s3c_gpio_cfgpin(gpio, S3C_GPIO_SFN(2));
 		s3c_gpio_setpull(gpio, S3C_GPIO_PULL_NONE);
 	}
