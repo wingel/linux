@@ -24,6 +24,9 @@
 #include <linux/gpio.h>
 #include <linux/fb.h>
 #include <linux/delay.h>
+#include <linux/spi/spi.h>
+#include <linux/spi/spi_gpio.h>
+#include <linux/platform_data/spi-s3c64xx.h>
 
 #include <asm/mach/arch.h>
 #include <asm/mach/map.h>
@@ -211,6 +214,61 @@ static struct s3c_fb_platdata smdk2416_fb_platdata = {
 	.vidcon1	= VIDCON1_INV_HSYNC | VIDCON1_INV_VSYNC,
 };
 
+static struct spi_board_info sds7102_spi_board_info[] = {
+	[0] = {
+		.modalias	= "ks8851",
+		.irq		= IRQ_EINT1,
+		.max_speed_hz	= 40*1000*1000,
+		.bus_num	= 1,
+		.mode		= SPI_MODE_0,
+		.chip_select	= 0,
+		.controller_data = (void *)S3C2410_GPL(13),
+	},
+};
+
+#if 0
+static struct resource s3c2416_spi_resource[] = {
+	[0] = DEFINE_RES_MEM(S3C2443_PA_SPI0, SZ_256),
+	[1] = DEFINE_RES_IRQ(IRQ_SPI0),
+#if 0
+	[2] = DEFINE_RES_DMA(DMACH_SPI0_TX),
+	[3] = DEFINE_RES_DMA(DMACH_SPI0_RX),
+#endif
+};
+
+static struct platform_device sds7102_device_spi = {
+	.name		= "s3c2443-spi",
+	.id		= 1,
+	.num_resources	= ARRAY_SIZE(s3c2416_spi_resource),
+	.resource	= s3c2416_spi_resource,
+#if 0
+	.dev = {
+		.dma_mask		= &samsung_device_dma_mask,
+		.coherent_dma_mask	= DMA_BIT_MASK(32),
+	},
+#endif
+};
+
+struct s3c64xx_spi_info sds7102_device_spi_pdata __initdata = {
+	0,
+	1,
+	0, // int (*cfg_gpio)(void);
+};
+#else
+static struct spi_gpio_platform_data sds7102_spi = {
+	.sck		= S3C2410_GPE(13),
+	.mosi		= S3C2410_GPE(12),
+	.miso		= S3C2410_GPE(11),
+	.num_chipselect = 1,
+};
+
+static struct platform_device sds7102_device_spi = {
+	.name		= "spi_gpio",
+	.id		= 1,
+	.dev.platform_data = &sds7102_spi,
+};
+#endif
+
 static struct s3c_sdhci_platdata smdk2416_hsmmc0_pdata __initdata = {
 	.max_width		= 4,
 	.cd_type		= S3C_SDHCI_CD_GPIO,
@@ -226,13 +284,14 @@ static struct s3c_sdhci_platdata smdk2416_hsmmc1_pdata __initdata = {
 static struct platform_device *smdk2416_devices[] __initdata = {
 	&s3c_device_fb,
 	&s3c_device_wdt,
-	&s3c_device_ohci,
-	&s3c_device_i2c0,
+//	&s3c_device_ohci,
+//	&s3c_device_i2c0,
 #if 0
 	&s3c_device_hsmmc0,
 	&s3c_device_hsmmc1,
 #endif
-	&s3c_device_usb_hsudc,
+	&sds7102_device_spi,
+//	&s3c_device_usb_hsudc,
 };
 
 static void __init smdk2416_map_io(void)
@@ -247,6 +306,10 @@ static void __init smdk2416_machine_init(void)
 {
 	s3c_i2c0_set_platdata(NULL);
 	s3c_fb_set_platdata(&smdk2416_fb_platdata);
+
+	// s3c_set_platdata(&sds7102_device_spi_pdata, sizeof(sds7102_device_spi_pdata), &sds7102_device_spi);
+
+	s3c_gpio_setpull(S3C2410_GPF(1), S3C_GPIO_PULL_NONE);
 
 #if 0
 	s3c_sdhci0_set_platdata(&smdk2416_hsmmc0_pdata);
@@ -271,6 +334,13 @@ static void __init smdk2416_machine_init(void)
 			      S3C2410_MISCCR_CLK1_UPLL);
 
 	platform_add_devices(smdk2416_devices, ARRAY_SIZE(smdk2416_devices));
+
+	if (1)
+	{
+		spi_register_board_info(sds7102_spi_board_info,
+					ARRAY_SIZE(sds7102_spi_board_info));
+	}
+
 	smdk_machine_init();
 }
 
