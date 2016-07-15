@@ -136,7 +136,9 @@ start:
  THUMB(		.thumb			)
 1:
 		mov	r0, #0
-		mov	r1, #0xffffffff
+@		mov	r1, #0xffffffff		@ S3C2416-DT
+		mov	r1, #1685 & 0xff00	@ SMDK2416
+		orr	r1, r1, #1685 & 0xff	@ SMDK2416
 		mov	r3, #0
 		mrs	r9, cpsr
 #ifdef CONFIG_ARM_VIRT_EXT
