@@ -276,6 +276,11 @@ static void __init smdk2416_machine_init(void)
 	s3c_i2c0_set_platdata(NULL);
 	s3c_fb_set_platdata(&smdk2416_fb_platdata);
 
+	/* FPGA config */
+	s3c_gpio_setpull(S3C2410_GPK(5), S3C_GPIO_PULL_UP);
+	s3c_gpio_setpull(S3C2410_GPK(7), S3C_GPIO_PULL_UP);
+	s3c_gpio_setpull(S3C2410_GPK(13), S3C_GPIO_PULL_UP);
+
 #if 0
 	s3c_sdhci0_set_platdata(&smdk2416_hsmmc0_pdata);
 	s3c_sdhci1_set_platdata(&smdk2416_hsmmc1_pdata);
