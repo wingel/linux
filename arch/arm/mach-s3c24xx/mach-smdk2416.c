@@ -159,25 +159,24 @@ static struct s3c_fb_pd_win smdk2416_fb_win[] = {
 		.default_bpp	= 16,
 		.max_bpp	= 32,
 		.xres           = 800,
-		.yres           = 480,
+		.yres           = 600,
 	},
 };
 
 static struct fb_videomode smdk2416_lcd_timing = {
-	.pixclock	= 41094,
-	.left_margin	= 8,
-	.right_margin	= 13,
-	.upper_margin	= 7,
-	.lower_margin	= 5,
-	.hsync_len	= 3,
-	.vsync_len	= 1,
-	.xres           = 800,
-	.yres           = 480,
+	.pixclock	= 35045,
+	.left_margin	= 0x2e,
+	.right_margin	= 0x96,
+	.upper_margin	= 0x0e,
+	.lower_margin	= 0x0c,
+	.hsync_len	= 0x01,
+	.vsync_len	= 0x0a,
+	.xres           = 800,	/* 0x320 */
+	.yres           = 600,	/* 0x258 */
 };
 
 static void s3c2416_fb_gpio_setup_24bpp(void)
 {
-#if 0
 	unsigned int gpio;
 
 	for (gpio = S3C2410_GPC(1); gpio <= S3C2410_GPC(4); gpio++) {
@@ -194,7 +193,6 @@ static void s3c2416_fb_gpio_setup_24bpp(void)
 		s3c_gpio_cfgpin(gpio, S3C_GPIO_SFN(2));
 		s3c_gpio_setpull(gpio, S3C_GPIO_PULL_NONE);
 	}
-#endif
 }
 
 static struct s3c_fb_platdata smdk2416_fb_platdata = {
