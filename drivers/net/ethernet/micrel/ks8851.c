@@ -1424,6 +1424,7 @@ static int ks8851_probe(struct spi_device *spi)
 	ks->spidev = spi;
 	ks->tx_space = 6144;
 
+#if 0
 	gpio = of_get_named_gpio_flags(spi->dev.of_node, "reset-gpios",
 				       0, NULL);
 	if (gpio == -EPROBE_DEFER) {
@@ -1440,6 +1441,7 @@ static int ks8851_probe(struct spi_device *spi)
 			goto err_gpio;
 		}
 	}
+#endif
 
 	ks->vdd_io = devm_regulator_get(&spi->dev, "vdd-io");
 	if (IS_ERR(ks->vdd_io)) {
@@ -1588,8 +1590,10 @@ static int ks8851_remove(struct spi_device *spi)
 
 	unregister_netdev(priv->netdev);
 	free_irq(spi->irq, priv);
+#if 0
 	if (gpio_is_valid(priv->gpio))
 		gpio_set_value(priv->gpio, 0);
+#endif
 	regulator_disable(priv->vdd_reg);
 	regulator_disable(priv->vdd_io);
 	free_netdev(priv->netdev);
