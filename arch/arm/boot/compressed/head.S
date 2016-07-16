@@ -145,6 +145,14 @@ start:
 #ifdef CONFIG_ARM_VIRT_EXT
 		bl	__hyp_stub_install	@ get into SVC mode, reversibly
 #endif
+
+		@ hardcode parameters that should normally come from bootloader
+		mov	r0, #0
+		mov	r1, #1685 & 0xff00	@ SMDK2416
+		orr	r1, r1, #1685 & 0xff	@ SMDK2416
+		mov	r2, #0
+		mov	r3, #0
+
 		mov	r7, r1			@ save architecture ID
 		mov	r8, r2			@ save atags pointer
 
