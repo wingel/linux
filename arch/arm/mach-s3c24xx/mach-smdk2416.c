@@ -292,13 +292,11 @@ static void __init smdk2416_machine_init(void)
 
 	gpio_request(S3C2410_GPB(4), "USBHost Power");
 	gpio_direction_output(S3C2410_GPB(4), 1);
-
-	gpio_request(S3C2410_GPB(3), "Display Power");
-	gpio_direction_output(S3C2410_GPB(3), 1);
-
-	gpio_request(S3C2410_GPB(1), "Display Reset");
-	gpio_direction_output(S3C2410_GPB(1), 1);
 #endif
+
+	/* TODO GPB3 can be a PWM signal and give more fine grained control */
+	gpio_request(S3C2410_GPB(3), "Display Brightness");
+	gpio_direction_output(S3C2410_GPB(3), 0);
 
 	s3c_gpio_setpull(S3C2410_GPF(1), S3C_GPIO_PULL_UP); /* ETH IRQ */
 	s3c_gpio_setpull(S3C2410_GPL(13), S3C_GPIO_PULL_UP); /* ETH CS */
