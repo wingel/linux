@@ -206,8 +206,18 @@ static void s3c_hsudc_init_phy(void)
 	writel(cfg, S3C2443_URSTCON);
 
 	cfg = readl(S3C2443_PHYCTRL);
+#if 0
+	/* This hangs the kernel soon after */
 	cfg &= ~(S3C2443_PHYCTRL_CLKSEL | S3C2443_PHYCTRL_DSPORT);
 	cfg |= (S3C2443_PHYCTRL_EXTCLK | S3C2443_PHYCTRL_PLLSEL);
+#else
+	/* From SDS7102 bootloader.  It seem that the S3C2416 has a
+	 * different PHYCTRL layout compared to the S3C2443 */
+	cfg &= 0x3e;
+	cfg |= 0x10;
+#endif
+	printk("%s:%u: PHYCTRL <- 0x%08x\n", __func__, __LINE__,
+	       (unsigned)cfg);
 	writel(cfg, S3C2443_PHYCTRL);
 
 	cfg = readl(S3C2443_PHYPWR);

@@ -147,14 +147,14 @@ static void smdk2416_hsudc_gpio_init(void)
 	s3c_gpio_setpull(S3C2410_GPH(14), S3C_GPIO_PULL_UP);
 	s3c_gpio_setpull(S3C2410_GPF(2), S3C_GPIO_PULL_NONE);
 	s3c_gpio_cfgpin(S3C2410_GPH(14), S3C_GPIO_SFN(1));
-	s3c2410_modify_misccr(S3C2416_MISCCR_SEL_SUSPND, 0);
 #endif
+	s3c2410_modify_misccr(S3C2416_MISCCR_SEL_SUSPND, 0);
 }
 
 static void smdk2416_hsudc_gpio_uninit(void)
 {
-#if 0
 	s3c2410_modify_misccr(S3C2416_MISCCR_SEL_SUSPND, 1);
+#if 0
 	s3c_gpio_setpull(S3C2410_GPH(14), S3C_GPIO_PULL_NONE);
 	s3c_gpio_cfgpin(S3C2410_GPH(14), S3C_GPIO_SFN(0));
 #endif
@@ -261,11 +261,11 @@ static struct platform_device *smdk2416_devices[] __initdata = {
 	&s3c_device_fb,
 	&s3c_device_wdt,
 	&s3c_device_ohci,
+	&s3c_device_usb_hsudc,
 #if 0
 	&s3c_device_i2c0,
 	&s3c_device_hsmmc0,
 	&s3c_device_hsmmc1,
-	&s3c_device_usb_hsudc,
 #endif
 	&sds7102_device_spi,
 	&s3c2443_device_dma,
@@ -318,12 +318,11 @@ static void __init smdk2416_machine_init(void)
 	s3c_gpio_setpull(S3C2410_GPK(13), S3C_GPIO_PULL_UP);
 
 	s3c_ohci_set_platdata(&sds7102_usb_info);
+	s3c24xx_hsudc_set_platdata(&smdk2416_hsudc_platdata);
 
 #if 0
 	s3c_sdhci0_set_platdata(&smdk2416_hsmmc0_pdata);
 	s3c_sdhci1_set_platdata(&smdk2416_hsmmc1_pdata);
-
-	s3c24xx_hsudc_set_platdata(&smdk2416_hsudc_platdata);
 
 	gpio_request(S3C2410_GPB(4), "USBHost Power");
 	gpio_direction_output(S3C2410_GPB(4), 1);
