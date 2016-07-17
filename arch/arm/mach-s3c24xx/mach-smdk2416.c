@@ -50,6 +50,7 @@
 #include <plat/cpu.h>
 #include <linux/platform_data/mtd-nand-s3c2410.h>
 #include <plat/sdhci.h>
+#include <linux/platform_data/usb-ohci-s3c2410.h>
 #include <linux/platform_data/usb-s3c2410_udc.h>
 #include <linux/platform_data/s3c-hsudc.h>
 #include <plat/samsung-time.h>
@@ -129,6 +130,15 @@ static struct s3c2410_uartcfg smdk2416_uartcfgs[] __initdata = {
 		.ufcon	     = UFCON,
 	}
 #endif
+};
+
+static struct s3c2410_hcd_info sds7102_usb_info __initdata = {
+	.port[0]	= {
+		.flags	= S3C_HCDFLG_USED,
+	},
+	.port[1]	= {
+		.flags	= 0,
+	},
 };
 
 static void smdk2416_hsudc_gpio_init(void)
@@ -306,6 +316,8 @@ static void __init smdk2416_machine_init(void)
 	s3c_gpio_setpull(S3C2410_GPK(5), S3C_GPIO_PULL_UP);
 	s3c_gpio_setpull(S3C2410_GPK(7), S3C_GPIO_PULL_UP);
 	s3c_gpio_setpull(S3C2410_GPK(13), S3C_GPIO_PULL_UP);
+
+	s3c_ohci_set_platdata(&sds7102_usb_info);
 
 #if 0
 	s3c_sdhci0_set_platdata(&smdk2416_hsmmc0_pdata);

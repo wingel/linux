@@ -387,6 +387,11 @@ static int usb_hcd_s3c2410_probe(const struct hc_driver *driver,
 
 	s3c2410_start_hc(dev, hcd);
 
+	{
+	    struct ohci_hcd *ohci = hcd_to_ohci (hcd);
+	    ohci->num_ports = 1;
+	}
+
 	retval = usb_add_hcd(hcd, dev->resource[1].start, 0);
 	if (retval != 0)
 		goto err_ioremap;
