@@ -250,8 +250,8 @@ static struct s3c_sdhci_platdata smdk2416_hsmmc1_pdata __initdata = {
 static struct platform_device *smdk2416_devices[] __initdata = {
 	&s3c_device_fb,
 	&s3c_device_wdt,
-#if 0
 	&s3c_device_ohci,
+#if 0
 	&s3c_device_i2c0,
 	&s3c_device_hsmmc0,
 	&s3c_device_hsmmc1,
@@ -269,9 +269,32 @@ static void __init smdk2416_init_time(void)
 
 static void __init smdk2416_map_io(void)
 {
+	u32 epllcon;
+	u32 clksrc;
+
 	s3c24xx_init_io(smdk2416_iodesc, ARRAY_SIZE(smdk2416_iodesc));
 	s3c24xx_init_uarts(smdk2416_uartcfgs, ARRAY_SIZE(smdk2416_uartcfgs));
 	samsung_set_timer_source(SAMSUNG_PWM3, SAMSUNG_PWM4);
+
+	/* The clocks should really be set up by the bootloader, but
+	 * since we don't control the bootloder we have to do it here. */
+
+	/* Turn on EPLL and set output divider to 48 MHz */
+	epllcon = __raw_readl(S3C2443_EPLLCON);
+	printk("%s: EPLLCON 0x%08x\n", __func__, (int)epllcon);
+	epllcon &= ~(1<<24);
+	epllcon = (epllcon & ~3) | 3;
+	__raw_writel(epllcon, S3C2443_EPLLCON);
+	epllcon = __raw_readl(S3C2443_EPLLCON);
+	printk("%s: EPLLCON 0x%08x\n", __func__, (int)epllcon);
+
+	/* Make esysclk use the EPLL output */
+	clksrc = __raw_readl(S3C2443_CLKSRC);
+	printk("%s: CLKSRC 0x%08x\n", __func__, (int)clksrc);
+	clksrc |= (1<<6);	/* EsysClk selection = EPLL output */
+	__raw_writel(clksrc, S3C2443_CLKSRC);
+	clksrc = __raw_readl(S3C2443_CLKSRC);
+	printk("%s: CLKSRC 0x%08x\n", __func__, (int)clksrc);
 }
 
 static void __init smdk2416_machine_init(void)
