@@ -1333,6 +1333,7 @@ static int s3c_hsudc_probe(struct platform_device *pdev)
 		ret = PTR_ERR(hsudc->uclk);
 		goto err_res;
 	}
+	clk_prepare(hsudc->uclk);
 	clk_enable(hsudc->uclk);
 
 	local_irq_disable();
@@ -1348,6 +1349,7 @@ static int s3c_hsudc_probe(struct platform_device *pdev)
 
 	return 0;
 err_add_udc:
+	clk_unprepare(hsudc->uclk);
 	clk_disable(hsudc->uclk);
 err_res:
 	if (!IS_ERR_OR_NULL(hsudc->transceiver))
