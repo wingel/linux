@@ -584,6 +584,14 @@ static void ks8851_rx_pkts(struct ks8851_net *ks)
 	}
 }
 
+/* TODO This is supposed to be done by IRQF_ONESHOT, why does it not work? */
+static irqreturn_t ks8851_irq_check(int irq, void *_ks)
+{
+	struct ks8851_net *ks = _ks;
+	disable_irq_nosync(ks->netdev->irq);
+	return IRQ_WAKE_THREAD;
+}
+
 /**
  * ks8851_irq - IRQ handler for dealing with interrupt requests
  * @irq: IRQ number
@@ -679,7 +687,12 @@ static irqreturn_t ks8851_irq(int irq, void *_ks)
 	if (status & IRQ_TXI)
 		netif_wake_queue(ks->netdev);
 
-	return IRQ_HANDLED;
+	enable_irq(ks->netdev->irq);
+
+	if (handled)
+		return IRQ_HANDLED;
+	else
+		return IRQ_NONE;
 }
 
 /**
@@ -1544,7 +1557,7 @@ static int ks8851_probe(struct spi_device *spi)
 	ks8851_read_selftest(ks);
 	ks8851_init_mac(ks);
 
-	ret = request_threaded_irq(spi->irq, NULL, ks8851_irq,
+	ret = request_threaded_irq(spi->irq, ks8851_irq_check, ks8851_irq,
 				   IRQF_TRIGGER_LOW | IRQF_ONESHOT,
 				   ndev->name, ks);
 	if (ret < 0) {

@@ -25,6 +25,8 @@
 #include <linux/gpio.h>
 #include <linux/fb.h>
 #include <linux/delay.h>
+#include <linux/spi/spi.h>
+#include <linux/spi/spi_gpio.h>
 
 #include <asm/mach/arch.h>
 #include <asm/mach/map.h>
@@ -205,6 +207,31 @@ static struct s3c_fb_platdata smdk2416_fb_platdata = {
 	.vidcon1	= VIDCON1_INV_HSYNC | VIDCON1_INV_VSYNC,
 };
 
+static struct spi_board_info sds7102_spi_board_info[] = {
+	[0] = {
+		.modalias	= "ks8851",
+		.irq		= IRQ_EINT1,
+		.max_speed_hz	= 40*1000*1000,
+		.bus_num	= 1,
+		.mode		= SPI_MODE_0,
+		.chip_select	= 0,
+		.controller_data = (void *)S3C2410_GPL(13),
+	},
+};
+
+static struct spi_gpio_platform_data sds7102_spi = {
+	.sck		= S3C2410_GPE(13),
+	.mosi		= S3C2410_GPE(12),
+	.miso		= S3C2410_GPE(11),
+	.num_chipselect = 1,
+};
+
+static struct platform_device sds7102_device_spi = {
+	.name		= "spi_gpio",
+	.id		= 1,
+	.dev.platform_data = &sds7102_spi,
+};
+
 static struct s3c_sdhci_platdata smdk2416_hsmmc0_pdata __initdata = {
 	.max_width		= 4,
 	.cd_type		= S3C_SDHCI_CD_GPIO,
@@ -227,6 +254,7 @@ static struct platform_device *smdk2416_devices[] __initdata = {
 	&s3c_device_hsmmc1,
 	&s3c_device_usb_hsudc,
 #endif
+	&sds7102_device_spi,
 	&s3c2443_device_dma,
 };
 
@@ -264,7 +292,14 @@ static void __init smdk2416_machine_init(void)
 	gpio_direction_output(S3C2410_GPB(1), 1);
 #endif
 
+	s3c_gpio_setpull(S3C2410_GPF(1), S3C_GPIO_PULL_UP); /* ETH IRQ */
+	s3c_gpio_setpull(S3C2410_GPL(13), S3C_GPIO_PULL_UP); /* ETH CS */
+
+	spi_register_board_info(sds7102_spi_board_info,
+				ARRAY_SIZE(sds7102_spi_board_info));
+
 	platform_add_devices(smdk2416_devices, ARRAY_SIZE(smdk2416_devices));
+
 	smdk_machine_init();
 }
 
