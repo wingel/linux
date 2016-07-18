@@ -1134,7 +1134,7 @@ void __init s3c64xx_spi0_set_platdata(int (*cfg_gpio)(void), int src_clk_nr,
 
 	pd.num_cs = num_cs;
 	pd.src_clk_nr = src_clk_nr;
-	pd.cfg_gpio = (cfg_gpio) ? cfg_gpio : s3c64xx_spi0_cfg_gpio;
+	pd.cfg_gpio = 0; // (cfg_gpio) ? cfg_gpio : s3c64xx_spi0_cfg_gpio;
 #if defined(CONFIG_PL330_DMA)
 	pd.filter = pl330_filter;
 #elif defined(CONFIG_S3C64XX_PL080)

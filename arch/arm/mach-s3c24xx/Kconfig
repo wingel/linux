@@ -383,6 +383,7 @@ config MACH_SMDK2416
 	bool "SMDK2416"
 	select S3C2416_SETUP_SDHCI
 	select S3C24XX_SMDK
+	select S3C64XX_DEV_SPI0
 	select S3C_DEV_FB
 	select S3C_DEV_HSMMC
 	select S3C_DEV_HSMMC1

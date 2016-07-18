@@ -26,7 +26,6 @@
 #include <linux/fb.h>
 #include <linux/delay.h>
 #include <linux/spi/spi.h>
-#include <linux/spi/spi_gpio.h>
 
 #include <asm/mach/arch.h>
 #include <asm/mach/map.h>
@@ -44,6 +43,7 @@
 
 #include <linux/platform_data/leds-s3c24xx.h>
 #include <linux/platform_data/i2c-s3c2410.h>
+#include <linux/platform_data/spi-s3c64xx.h>
 
 #include <plat/gpio-cfg.h>
 #include <plat/devs.h>
@@ -220,29 +220,27 @@ static struct s3c_fb_platdata smdk2416_fb_platdata = {
 	.vidcon1	= VIDCON1_INV_HSYNC | VIDCON1_INV_VSYNC,
 };
 
+struct s3c64xx_spi_csinfo sds7102_ks8851_controller_data = {
+	.fb_delay	= 3,
+	.line		= S3C2410_GPL(13),
+};
+
+/* The ks8851 is supposed to be able to use a SPI clock up to 40MHz
+ * but it becomes unstable when running it faster than about 27MHz.
+ * It can become so wedged that a reboot or quick power cycle won't
+ * help.  Use 24MHz as a decently safe limit.  With 24MHz we can also
+ * run SPI off the EPLL and don't have to use the MPLL clock. */
+
 static struct spi_board_info sds7102_spi_board_info[] = {
 	[0] = {
 		.modalias	= "ks8851",
 		.irq		= IRQ_EINT1,
-		.max_speed_hz	= 40*1000*1000,
-		.bus_num	= 1,
+		.max_speed_hz	= 24*1000*1000,
+		.bus_num	= 0,
 		.mode		= SPI_MODE_0,
 		.chip_select	= 0,
-		.controller_data = (void *)S3C2410_GPL(13),
+		.controller_data = &sds7102_ks8851_controller_data,
 	},
-};
-
-static struct spi_gpio_platform_data sds7102_spi = {
-	.sck		= S3C2410_GPE(13),
-	.mosi		= S3C2410_GPE(12),
-	.miso		= S3C2410_GPE(11),
-	.num_chipselect = 1,
-};
-
-static struct platform_device sds7102_device_spi = {
-	.name		= "spi_gpio",
-	.id		= 1,
-	.dev.platform_data = &sds7102_spi,
 };
 
 static struct s3c_sdhci_platdata smdk2416_hsmmc0_pdata __initdata = {
@@ -266,8 +264,9 @@ static struct platform_device *smdk2416_devices[] __initdata = {
 	&s3c_device_i2c0,
 	&s3c_device_hsmmc0,
 	&s3c_device_hsmmc1,
-#endif
 	&sds7102_device_spi,
+#endif
+	&s3c64xx_device_spi0,
 	&s3c2443_device_dma,
 };
 
@@ -302,6 +301,10 @@ static void __init smdk2416_map_io(void)
 	clksrc = __raw_readl(S3C2443_CLKSRC);
 	printk("%s: CLKSRC 0x%08x\n", __func__, (int)clksrc);
 	clksrc |= (1<<6);	/* EsysClk selection = EPLL output */
+	if (0)
+	    clksrc |= (1<<18);	/* HS-SPI0 clock = MPLL (divided) */
+	else
+	    clksrc &= ~(1<<18);	/* HS-SPI0 clock = EPLL (divided) */
 	__raw_writel(clksrc, S3C2443_CLKSRC);
 	clksrc = __raw_readl(S3C2443_CLKSRC);
 	printk("%s: CLKSRC 0x%08x\n", __func__, (int)clksrc);
@@ -319,6 +322,12 @@ static void __init smdk2416_machine_init(void)
 
 	s3c_ohci_set_platdata(&sds7102_usb_info);
 	s3c24xx_hsudc_set_platdata(&smdk2416_hsudc_platdata);
+
+	s3c_gpio_cfgpin(S3C2410_GPE(11), S3C_GPIO_SFN(2)); /* SPI MISO */
+	s3c_gpio_cfgpin(S3C2410_GPE(12), S3C_GPIO_SFN(2)); /* SPI MOSI */
+	s3c_gpio_cfgpin(S3C2410_GPE(13), S3C_GPIO_SFN(2)); /* SPI SCK */
+	s3c_gpio_cfgpin(S3C2410_GPL(13), S3C_GPIO_SFN(0)); /* SPI CS */
+	s3c64xx_spi0_set_platdata(0, 2, 1);
 
 #if 0
 	s3c_sdhci0_set_platdata(&smdk2416_hsmmc0_pdata);
