@@ -356,7 +356,7 @@ static void __init smdk2416_machine_init(void)
 
 	/* TODO GPB3 can be a PWM signal and give more fine grained control */
 	gpio_request(S3C2410_GPB(3), "Display Brightness");
-	gpio_direction_output(S3C2410_GPB(3), 0);
+	gpio_direction_output(S3C2410_GPB(3), 1);
 
 	s3c_gpio_setpull(S3C2410_GPF(1), S3C_GPIO_PULL_UP); /* ETH IRQ */
 	s3c_gpio_setpull(S3C2410_GPL(13), S3C_GPIO_PULL_UP); /* ETH CS */
